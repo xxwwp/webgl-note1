@@ -1,0 +1,22 @@
+$
+View = 
+\begin{bmatrix} 
+0 & 0 & 0 & -eyeX \\
+0 & 0 & 0 & -eyeY \\
+0 & 0 & 0 & -eyeZ \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix} 
+gx & gy & gz & 0 \\
+tx & ty & tz & 0 \\
+ex & ey & ez & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+=
+\begin{bmatrix} 
+gx & gy & gz & gx * -eyeX + gy * -eyeY + gz * -eyeZ \\
+tx & ty & tz & tx * -eyeX + ty * -eyeY + tz * -eyeZ \\
+ex & ey & ez & ex * -eyeX + ey * -eyeY + ez * -eyeZ \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+$

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>实例化绘制</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>实例化绘制</h1>
+      <hr />
+
+      <p>本示例演示了复用同一个模型的数据进行多次绘制，点击后可交互。</p>
+
+      <style>
+        #webgl:focus {
+          outline: 10px solid rgb(109, 87, 255);
+        }
+      </style>
+      <canvas id="webgl" width="400" height="400" tabindex="-1"></canvas>
+
+      <p>
+        示例中渲染了 100 * 100 一共 1
+        万个正方体，但是却很流畅。不同于上一文《复用数据多次绘制》，这个示例使用的是实例化绘制。
+      </p>
+
+      <p>
+        实例化绘制实际上就是让着色器执行了多次，每次都分配一些数据用来标识，达到绘制多次的效果。实例化绘制中，可以把每次着色器的执行称为实例，实例化绘制就是在一次绘制中执行了多个实例。
+      </p>
+
+      <p>
+        实例化的 api 很简单，在 webgl2 中，我们把 <code>gl.drawElements</code> 或 <code>gl.drawArrays</code> 替换成
+        <code>gl.drawElementsInstanced</code> 或 <code>gl.drawArraysInstanced</code> 即可。这两个新的实例化绘制 api
+        使用方式和原来的基本相同，只是参数末尾额外添加了一个整数表示重复渲染多少次。
+      </p>
+
+      <p>实例化绘制 api 的声明如下：</p>
+
+      <pre data-code="code1.js" data-lang="js"></pre>
+
+      <p>相比原本的绘制，两个实例化绘制 api 都格外新增了 <code>instanceCount</code> 参数用来表示着色器再绘制多少次。</p>
+
+      <p>
+        然而如果数据不发生改变，重复绘制多少都没卵用，所以我们要设置<strong>实例数据</strong>，这个名词不是官方的，是本文用以区别其他数据的。<strong
+          >实例数据在每次实例绘制时只会读取一次，并不会逐顶点读取数据，所以每个实例绘制时都会有自己的实例数据用以区分实例的绘制。</strong
+        >
+      </p>
+
+      <p>
+        实例数据的绑定和绑定 attribute 变量完全相同，但是我们需要额外告诉 webgl 哪些 attribute 变量是实例数据，webgl
+        就是在每次执行实例时切换实例数据。
+      </p>
+
+      <p>webgl 提供 <code>gl.vertexAttribDivisor</code> 来标记某个 attribute 变量在绘制是实例数据，比如：</p>
+
+      <pre data-code="code2.js" data-lang="js"></pre>
+
+      <p>
+        <code>gl.vertexAttribDivisor</code> 的第二个参数表示每隔多少个实例更新一次标记的实例数据，设置成 1
+        表示每渲染下一个实例，实例数据就更新一次，设置成 n 表示切换 n
+        次实例才更新一次实例数据。所以上面的代码就表示每渲染一个实例，就从
+        <code>a_Foo</code> 的缓冲区里面读取一次数据。实例数据只能是 attribute 变量，但是它的类型是任意的。
+      </p>
+
+      <p>
+        示例代码中，我们定义定义了一个叫 <code>a_Offset</code> 的实例数据，每次接收一个浮点数，依次是 0.0、1.0、2.0
+        ...，相当于每次实例执行时的索引，然后我们让实例执行 10000 次，用来渲染一个 100 * 100 的正方体阵。
+      </p>
+
+      <p>
+        不过示例代码中，我们并没有使用 webgl2，使用的是 webgl1，webgl1
+        默认不支持实例化渲染，需要开启扩展，开启扩展很简单，如下：
+      </p>
+
+      <pre data-code="app.js" data-slice="107,109" data-lang="js"></pre>
+
+      <p>
+        这将在 webgl1 中获取实例化绘制的扩展对象，这个对象包含了实例化位置的 api 还有设置实例数据的 api，可以在
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/ANGLE_instanced_arrays">MDN</a> 上查看使用方法。
+      </p>
+
+      <p>然后是执行实例化绘制的代码如下：</p>
+
+      <pre data-code="app.js" data-slice="200,203" data-lang="js"></pre>
+
+      <p>扩展的 api 和标准的不太一样，但是功能是相同的。</p>
+
+      <p>为了让每个正方体产生偏移不都挤在一起，我们对每个实例的坐标值都进行了偏移。</p>
+
+      <pre data-code="app.js" data-slice="21,26" data-lang="glsl"></pre>
+
+      <p>
+        为了更好观看，我们使用的是 Z
+        轴渲染，但是新的问题来了，模型矩阵不是实例数据，所以所有实例都使用同一个模型矩阵，这使得我们对模型偏移后，还是沿着
+        Z 轴旋转而不是自转。
+      </p>
+
+      <p>如果需要让每个正方体都进行自转，就说明每个正方体的模型矩阵不一样，解决方案有两个：</p>
+
+      <ul>
+        <li>
+          一种是把每个模型的模型矩阵都计算出来然后放到缓冲区里面，显然 JavaScript 不能保证计算 10000
+          个正方体的模型矩阵能很快，这种方式不太实用，没有用到 GPU 的计算能力。
+        </li>
+
+        <li>
+          既然每个正方体的模型矩阵都要算，那就直接丢给着色器算了，可能大家会觉得我在 js 里，10000 个正方体就是 10000
+          次计算，如果移动到着色器里面，10000 个正方体有几十万个顶点，每个顶点都算一次，岂不是更慢？实际上 webgl 和
+          OpenGL 快不仅仅是因为 GPU 计算单元多才快，而是重复的计算是 webgl 会缓存，所以相同的计算并不会重复多次。
+        </li>
+      </ul>
+    </article>
+  </body>
+</html>

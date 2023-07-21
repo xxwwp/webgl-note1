@@ -1,0 +1,39 @@
+$$
+M透视=
+\begin{bmatrix}
+  -1 & 0 & 0 & 0 \\
+  0 & -1 & 0 & 0 \\
+  0 & 0 & -2 & -3 \\
+  0 & 0 & 1 & 0
+\end{bmatrix}
+$$
+对于任意一点 q 经过矩阵转化的 q' 有：
+$$
+q'= 
+\begin{bmatrix}
+  -1 & 0 & 0 & 0 \\
+  0 & -1 & 0 & 0 \\
+  0 & 0 & -2 & -3 \\
+  0 & 0 & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+  x \\
+  y \\
+  z \\
+  1
+\end{bmatrix}
+=
+\begin{bmatrix}
+  -x \\
+  -y \\
+  -2z-3 \\
+  z
+\end{bmatrix}
+归一化得：
+\begin{bmatrix}
+  \frac{-x}{z} \\
+  \frac{-y}{z} \\
+  \frac{-2z-3}{z} \\
+  1
+\end{bmatrix}
+$$

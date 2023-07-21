@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>绘制一个点2</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>绘制一个点3</h1>
+      <hr />
+
+      <p>这个示例完成了使用鼠标点击 canvas 绘制一个点。</p>
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>
+        根据《绘制一个点2》的代码，在初始化背景后不自动绘制点，而是给 canvas 绑定一个点击事件，<code>main</code>
+        函数末尾有如下改动：
+      </p>
+
+      <pre data-code="app.js" data-slice="30,42" data-lang="js"></pre>
+
+      <p>所以现在详细的操作都在 <code>clickDraw</code> 函数当中：</p>
+
+      <pre data-code="app.js" data-slice="43,70" data-lang="js"></pre>
+
+      <p>可以看到其实绘制交互并不复杂，主要的计算是把 js 中的坐标转化到 webgl 中。</p>
+
+      <p>
+        js 中的坐标都是以像素为单位，根据代码注释可知，<code>e.clientX - rect.left</code> 即为点击 canvas 时鼠标相对
+        canvas 左上角的水平偏移量，同理
+        <code>e.clientY - rect.top</code>是垂直偏移量。这些值都是像素，如果直接除以对应的宽度和高度，结果将在 [0, 1]
+        之间， 所以代码中又再次乘 2 把区间扩充到 [0, 2] 之间。接着减去偏移量 1，把坐标转移 webgl 的坐标区间 [-1, 1]
+        之间。可是这还不够，因为 js 中的 Y 轴是从上到下的，而 webgl 是从下到上，所以还需要对 Y 轴坐标取相反数。
+      </p>
+
+      <h2>每次绘制都是新的</h2>
+
+      <p>webgl 的绘制和 canvas 2d 的绘制不同，每一次绘制都是新的。</p>
+
+      <p>在 canvas 2d 绘制中，每次绘制都是基于上次绘制的画布继续绘制，如果不清理画布，绘制就会依次叠加起来。</p>
+
+      <p>
+        上述代码的点击事件中，每次绘制都使用
+        <code>gl.clear</code>
+        清理了画布，如果隐藏这行代码，就会发现背景在第一次绘制后就消失了，而重复点击画布继续绘制，上次绘制的点也会消失，
+        这是 webgl 不同于 canvas 2d 的地方。
+      </p>
+
+      <p>webgl 每次绘制都会把结果填充到缓冲区，然后替换上一帧的数据，这是默认操作。后面会再提及。</p>
+
+      <h2>异步绘制</h2>
+
+      <p>
+        我尝试把两次 <code>gl.drawArrays</code> 放到异步，和阻塞的同步流程中，发现如果是同步运算，就算阻塞 webgl
+        也只会进行一次运算。在异步操作中，微任务异步也是一次渲染，而 js 事件队列产生的异步时，渲染可能发生一次或两次。
+      </p>
+
+      <p>例如下面的阻塞同步代码，webgl 就只会渲染一次：</p>
+
+      <pre data-code="code1.js" data-lang="js"></pre>
+
+      <p>而下面的异步代码，webgl 有时会渲染一次，有时是渲染两次，可以得出 webgl 一旦渲染和主线程是分离的：</p>
+
+      <pre data-code="code2.js" data-lang="js"></pre>
+    </article>
+  </body>
+</html>

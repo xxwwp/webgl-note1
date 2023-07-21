@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>绘制多个有色点</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>绘制多个有色点</h1>
+      <hr />
+      <p>这个示例演示了如何绘制多个点并自定义颜色。尝试点击渲染区域进行点的绘制。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>
+        示例中片元着色器新增了变量 uniform vec4 类型 <code>u_FragColor</code>，在片元着色器中不能使用 attribute 声明。
+      </p>
+
+      <pre data-code="app.js" data-slice="10,15" data-lang="glsl"></pre>
+
+      <p>
+        类似顶点着色器中 attribute 声明变量的传值，<code>u_FragColor</code> 被赋值给了内部变量
+        <code>gl_FragColor</code>。
+      </p>
+
+      <blockquote><code>precision mediump float</code> 表示精度设置为中等，这个后续补充。</blockquote>
+
+      <p>然后在渲染时，需要取出 <code>u_FragColor</code> 在 webgl 中的位置：</p>
+
+      <pre data-code="app.js" data-slice="37,41" data-lang="js"></pre>
+
+      <p>
+        然后在渲染函数中渲染，这里在全局声明了数组
+        <code>points</code> 存放每次绘制点的信息，方便后续重复绘制。接着在渲染函数中逐个点进行绘制即可：
+      </p>
+
+      <pre data-code="app.js" data-slice="72,92" data-lang="js"></pre>
+
+      <h2>gl.uniform[1234]f[v]</h2>
+
+      <p>
+        对 GLSL 内 uniform 声明的变量进行写入时，使用 <code>gl.uniform...</code> 函数，它的使用方式类似
+        <code>gl.vertexAttrib...</code>。
+      </p>
+
+      <p>
+        <strong> 但是 <code>gl.uniform...</code> 的参数没有默认填充</strong>，所以设置颜色时需要全部填充，只能使用
+        <code>gl.uniform4f</code> 或者 <code>gl.uniform4fv</code>。
+      </p>
+    </article>
+  </body>
+</html>

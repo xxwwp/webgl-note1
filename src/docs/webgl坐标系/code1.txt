@@ -1,0 +1,8 @@
+
+  for (each triangle T)             // 遍历三角形顶点数据
+    for (each sample (x,y,z) in T)  // 获取顶点坐标
+      if (z < zbuffer[x,y])         // 这个点 z 值之前绘制的更近
+        framebuffer[x,y] = rgb;     // 更新这个像素的颜色
+        zbuffer[x,y] = z;           // 更新这个像素的深度
+      else
+        ; // do nothing, this sample is occluded

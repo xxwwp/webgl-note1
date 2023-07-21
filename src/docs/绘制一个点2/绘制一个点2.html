@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>绘制一个点2</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>绘制一个点2</h1>
+      <hr />
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>该示例基于【绘制一个点】实现了 js 与 glsl 语言的交互。</p>
+
+      <p>在顶点着色器中，声明了一个位置变量 <code>a_Position</code>，然后把值赋给了 <code>gl_Position</code>。</p>
+
+      <pre data-code="app.js" data-slice="0,8" data-lang="js"></pre>
+
+      <p>
+        关键字 <strong>attribute</strong> 用以在 glsl 中声明一个变量，紧跟类型和变量组合成声明语句。所以
+        <code>a_Position</code> 的类型为 <code>vec4</code>。
+      </p>
+
+      <p>然后在 js 中，可以通过 webgl 上下文 api 对 <code>a_Position</code> 进行赋值。</p>
+
+      <pre data-code="app.js" data-slice="29,38" data-lang="js"></pre>
+
+      <p>
+        在 <code>gl.getAttribLocation(gl.program, "a_Position")</code> 中，<code>getAttribLocation</code> 用来获取
+        <code>a_Position</code> 的地址，<code>gl.program</code> 是一个着色器程序，它不是 webgl 上下文的属性，是执行
+        <code>initShaders</code> 时后期赋值上去的，类似
+        <code>window.foo = obj</code>，它包含了示例中的顶点着色器和片元着色器程序，它的创建后期再解释。
+      </p>
+
+      <p>
+        <code>gl.vertexAttrib3f</code> 值传入了三个值，没有齐次坐标的最后一个值，如果没有，最后一个值就会默认为
+        1.0。当然也可以使用 <code>gl.vertexAttrib4f</code> 详细指定所有的值。
+      </p>
+
+      <blockquote>
+        这里可以看出，webgl 的 api 非常低级，对
+        <strong> glsl 内部变量进行赋值是先查找地址，然后修改地址数据进行赋值。</strong>
+      </blockquote>
+
+      <h2>glsl 内部的变量声明</h2>
+
+      <pre><code class="language-glsl">attribute vec4 a_Position;</code></pre>
+
+      <p>在这行声明中，<code>attribute</code> 被称作<strong>存储限定符</strong>。</p>
+
+      <blockquote>
+        glsl 中只有两个声明变量的关键字，其中一个是 <code>attribute</code>，另一个是 <code>uniform</code>。
+      </blockquote>
+
+      <h2>webgl 相关函数命名规范</h2>
+
+      <p>示例中使用到了 <code>gl.vertexAttrib3f</code>，它的命名规范是按照 OpenGL 来的，格式如下：</p>
+
+      <pre><code>函数名 向量或顶点参数 类型</code></pre>
+
+      <p>
+        所以 <code>gl.vertexAttrib3f</code> 中的 <code>3f</code> 其实指的是接受 3 个值作为顶点或向量的值，类型是 float
+        浮点型。 同理还有：
+      </p>
+
+      <pre><code>gl.vertexAttrib[1234]f</code></pre>
+
+      <p>
+        其中
+        <code>[1234]</code>
+        表示任意其中任意一个数字。<strong
+          >数字决定了该函数会使用到所给参数的个数，传入多余的参数无效使用默认值填充。</strong
+        >
+        四个默认值依次是：<code>0.0, 0.0, 0.0, 1.0</code>注意，最后一个参数默认值是
+        <code>1.0</code>，提供数据在齐次坐标下计算的能力。
+      </p>
+
+      <p>
+        所以
+        <code>gl.vertexAttrib1f(position, 1.0, 0.0 ,0.8)</code> 全等于
+        <code>gl.vertexAttrib4f(position, 1.0, 0.0 ,0.0, 1.0)</code>，多余的参数无效使用默认值填充。
+      </p>
+
+      <p>也可以使用向量的形式传入一组数据，比如：</p>
+
+      <pre><code class="language-js">gl.vertexAttrib3fv(a_Position, new Float32Array([0.0, 0.0, 0.0]) );</code></pre>
+
+      <p>把 <code>3f</code> 替换为 <code>3fv</code> 即可，<code>v</code> 可以理解为向量 vector 或顶点 vertex 都行。</p>
+
+      <h2>gl.vertexAttrib</h2>
+
+      <p>
+        以 <code>gl.vertexAttrib</code> 开始的方法用来设置着色器中
+        <code>attribute</code> 声明的向量或点。它的命名方式为：
+      </p>
+
+      <pre><code>gl.vertexAttrib[1234]f[v](position, ...)</code></pre>
+
+      <p>
+        <code>vertexAttrib</code> 紧跟一个数字表示获取多少数据进行写入，<code>f</code> 表示 float 传入的数据是浮点数，
+        比如使用 <code>gl.vertexAttrib1f</code> 时，就只能设置 X 轴的位置，多余的参数无效。
+      </p>
+
+      <p>当使用的 vertexAttrib</p>
+    </article>
+  </body>
+</html>

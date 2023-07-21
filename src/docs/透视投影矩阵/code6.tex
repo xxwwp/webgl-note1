@@ -1,0 +1,34 @@
+$$
+\begin{bmatrix}
+  n & 0 & 0 & 0 \\
+  0 & n & 0 & 0 \\
+  0 & 0 & n + f & -nf \\
+  0 & 0 & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+  x \\
+  y \\
+  z \\
+  1
+\end{bmatrix}
+=
+\begin{bmatrix}
+  nx \\
+  ny \\
+  z(n+f) -nf \\
+  z
+\end{bmatrix}
+归一化：
+\begin{bmatrix}
+  \frac{nx}{z} \\
+  \frac{ny}{z} \\
+  \frac{z(n+f) - nf}{z} \\
+  1
+\end{bmatrix}
+$$
+有：
+$$
+M挤压(Zinput)=Zout=
+\frac{z(n+f) - nf}{z}=
+-\frac{nf}{z} + n + f
+$$

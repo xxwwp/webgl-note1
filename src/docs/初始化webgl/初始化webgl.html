@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>初始化webgl</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>初始化webgl</h1>
+      <canvas id="canvas" width="300" height="300"></canvas>
+
+      <pre data-code="app.js"></pre>
+
+      <p>webgl 的初始化依赖于 canvas 元素，canvas 元素提供一个 getContext 函数实例化 webgl。</p>
+
+      <p>
+        在用例中，我们使用 <code>getContext("webgl2")</code> 来实例化 webgl 上下文对象，其中的
+        <code>webgl2</code> 代表使用的是 2 版本。
+      </p>
+
+      <p>getContext 返回一个上下文对象或者 null，可以通过判断返回值是不是 null 确定上下文是否实例化成功。</p>
+
+      <p>
+        这里使用 gl 对 webgl 上下文进行命名，这样可以和 OpenGL 中的 api 进行对齐，比如
+        <code>gl.clearColor</code> 正好对齐 OpenGL 中的 glClearColor 函数。
+      </p>
+
+      <p>
+        webgl 中的色值范围是 0 到 1，颜色通道有四条 red，green，blue 和 alpha，同 css 中的 rgba 类似，只是取值返回从 0
+        到 255 变换为 0 到 1。
+      </p>
+
+      <p>
+        <code>gl.clearColor</code> 表示设置清除画布的颜色，<code>gl.clear</code> 表示使用前面设置的颜色清除画布。 其中
+        <code>gl.COLOR_BUFFER_BIT</code> 指定了颜色所在的缓冲区。
+      </p>
+
+      <blockquote>颜色缓冲区这里暂时不是很理解。</blockquote>
+    </article>
+  </body>
+</html>

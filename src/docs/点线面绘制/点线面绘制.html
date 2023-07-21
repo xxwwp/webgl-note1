@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>点线面绘制</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>点线面绘制</h1>
+      <hr />
+
+      <p>
+        上一节中介绍如何绘制一个三角形，使用了 <code>gl.drawArrays(gl.TRIANGLES, 0, 3);</code> 这条语句。第一个参数决定
+        webgl 如何根据缓存区中的顶点绘制怎样的图形。
+      </p>
+
+      <p><code>gl.drawArrays</code> 的第一个参数共有 7 个枚举值：</p>
+
+      <ul>
+        <li>gl.POINTS：绘制一系列点。</li>
+        <li>gl.LINE_STRIP：逐顶点绘制连续的线段。</li>
+        <li>gl.LINE_LOOP：逐顶点绘制连续的线段，并在最后进行首尾相接。</li>
+        <li>gl.LINES：两两顶点绘制多条线段。</li>
+        <li>
+          gl.TRIANGLE_STRIP：前三个顶点绘制一个三角形，然后依次取下一个顶点与该顶点之前的两个顶点组合成一个三角形。
+        </li>
+        <li>
+          gl.TRIANGLE_FAN：前三个顶点绘制一个三角形，然后依次取下一个顶点与该顶点之前的一个顶点还有最开始的一个顶点组合成一个三角形。
+        </li>
+        <li>gl.TRIANGLES: 三个顶点一组绘制三角形。</li>
+      </ul>
+
+      <p>假设缓冲区的顶点顺序依次是 v0，v1，v2，v3，v4，v5，上述枚举绘制的情况如下：</p>
+
+      <p><img src="./20230707182252.png" alt="" style="width: 100%; max-width: 901px" /></p>
+
+      <h2>一些示例的思维</h2>
+
+      <p>
+        比如说想绘制一个正方形，那么就可以使用 <code>gl.TRIANGLE_STRIP</code> 或 <code>gl.TRIANGLE_FAN</code> 使用 3
+        个顶点绘制，也可以使用 <code>gl.TRIANGLE</code> 然后使用 6 个顶点绘制。
+      </p>
+
+      <p>绘制曲线则需要使用 <code>gl.LINE_STRIP</code> 结合贝塞尔曲线公式标出沿途的大部分点绘制。</p>
+    </article>
+  </body>
+</html>

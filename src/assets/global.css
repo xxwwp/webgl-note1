@@ -1,0 +1,46 @@
+@import "./cdn.jsdelivr.net_npm_bootstrap@5.3.0_dist_css_bootstrap.min.css";
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, segoe ui, Roboto, helvetica neue, Arial, noto sans, sans-serif,
+    apple color emoji, segoe ui emoji, segoe ui symbol, noto color emoji;
+}
+
+.article {
+  margin: 50px auto;
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px;
+  border: 3px double rgb(200, 205, 205);
+  box-sizing: border-box;
+  color: #404040;
+}
+
+.article p {
+  margin: 1.2em 0;
+  line-height: 1.8em;
+}
+
+.article code {
+  background-color: rgb(238, 251, 255);
+  font-family: Menlo, Consolas, "Droid Sans Mono", monospace;
+  padding: 2px;
+}
+
+.article blockquote {
+  border: 1px solid rgb(158, 158, 255);
+  background-color: rgb(238, 238, 238);
+  padding: 10px 10px 10px 40px;
+}
+
+.article pre {
+  overflow-x: auto;
+  padding: 10px;
+}
+.article pre:not([class^="language-"]) {
+  background-color: rgb(49, 49, 49);
+  color: white;
+}
+
+.article pre code {
+  background-color: initial;
+}

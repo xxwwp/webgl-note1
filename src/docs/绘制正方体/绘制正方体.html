@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>绘制正方体</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>绘制正方体</h1>
+      <hr />
+
+      <p>
+        本示例介绍如何绘制元素，以及使用元素绘制一个正方体。示例可交互，获取焦点后可以使用键盘鼠标交互，键位为
+        <kbd>WASDTB</kbd> 移动和鼠标改变视角。
+      </p>
+
+      <style>
+        #webgl:focus {
+          outline: 10px solid rgb(109, 87, 255);
+        }
+      </style>
+      <canvas id="webgl" width="400" height="400" tabindex="-1"></canvas>
+
+      <p>
+        在 webgl 中，绘制平面的基础单位是三角形。假设绘制一个正方体，正方体有 6 个面，每个面至少由 2
+        个三角形组成，一个正方体最低就需要 12 个三角形。假设每个顶点有 xyz rgb 6 个浮点数据，当我们使用
+        <code>gl.TRIANGLES</code> 模式绘制时，那么我们就需要 $12 * 3 * 6 = 180$ 个顶点数据，如果使用
+        <code>gl.TRIANGLES_FAN</code> 或 <code>gl.TRIANGLE_STRIP</code> 模式，那我们就可以以最低 16
+        个顶点完成，计算量减半但是还是有顶点数据冗余。
+      </p>
+
+      <p>
+        元素绘制就解决上诉问题，让顶点数据可以复用。<strong>把每个顶点的数据看做一个元素</strong>，那么一个正方体 8
+        个顶点就是八个元素，<strong
+          >每个元素包含了这个顶点的全部数据。
+          元素在缓冲区里面是依次排列的，通过指定三个元素的索引给着色器，即可完成一个三角形的绘制</strong
+        >。
+      </p>
+
+      <h2>准备数据</h2>
+
+      <p>现在我们先把顶点数据和元素索引数据准备好：</p>
+
+      <pre data-code="app.js" data-slice="37,63" data-lang="js"></pre>
+
+      <p>
+        每个顶点由 xyz 坐标和 rgb
+        三个颜色组成，颜色部分使用随机数进行了填充。为了方便观看，我在每个顶点数据的后面添加了它们作为元素时的索引号，依次从
+        0 到 7。
+      </p>
+
+      <p>
+        接着
+        <code>elements</code>
+        则是表示了一个正方体各个面都是由哪些元素构成，我们使用元素的索引号来表示元素，每个面由两个三角形组成，所有就有 6
+        个元素，注意我们后面会使用
+        <code>gl.TRIANGLES</code>
+        模式绘制，这样我们编写元素索引时更直观一些。直接看数据还是比较困难，下面这个图片标记了这个正方体各个元素索引的位置。
+      </p>
+
+      <p><img src="./UML 图 (5).jpg" style="width: 100%; max-width: 400px" alt="" /></p>
+
+      <h3>初始化元素缓冲区</h3>
+
+      <p>
+        元素缓冲区的处理比顶点缓冲区简单很多，只有三步就是 <strong>创建、绑定、写入</strong>。webgl api
+        省去按照元素索引依次去顶点缓冲区取元素数据的过程，我们只需要按照元素缓冲区顺序依次绘制元素即可。
+      </p>
+
+      <p>这是初始化元素缓冲区的代码，只需要三行：</p>
+
+      <pre data-code="app.js" data-slice="138,150" data-lang="js"></pre>
+
+      <p>
+        <strong>不同于顶点缓冲的是，元素缓冲区绑定和写入的缓冲区位置是 <code>gl.ELEMENT_ARRAY_BUFFER</code>。</strong>
+      </p>
+
+      <h2>按照元素缓冲区绘制</h2>
+
+      <p>
+        之前我们使用的绘制一直是 <code>gl.drawArrays</code>，这是从顶点缓冲区进行绘制，现在需要修改为
+        <code>gl.drawElements</code> 绘制。这个函数声明如下：
+      </p>
+
+      <pre><code data-lang="txt">drawElements(mode, count, type, offset)</code></pre>
+
+      <ul>
+        <li>mode：表示渲染的模式，同 <code>gl.drawArrays</code> 第一个参数一样。</li>
+        <li>count：表示从元素缓冲区中取多少个元素进行绘制。</li>
+        <li>type：指定元素缓冲区中每个值的类型。</li>
+        <li>offset：指定读取元素缓冲区时的偏移量。</li>
+      </ul>
+
+      <p>使用如下：</p>
+
+      <pre data-code="app.js" data-slice="102,105" data-lang="js"></pre>
+
+      <p>把缓冲区看成流，上面的代码很容易理解。</p>
+
+      <p>
+        第三个参数 type 引起了我的注意，<code>gl.UNSIGNED_BYTE</code> 表示无符号字节类型，一个字节 8
+        位，正好对应了前面我们准备元素的索引时使用的的类型 <code>Unit8Array</code> 类型，但是这两个枚举并不相等
+        <code>Uint8Array.BYTES_PER_ELEMENT !== gl.UNSIGNED_BYTE</code>。 算了算，一个字节最大值也就
+        $2^8=256$，所以我们的顶点数就被限制到了 256 内，那要是一个模型有 300 个顶点，不是就溢出了。
+      </p>
+
+      <p>
+        后来看到 MDN 上有说明，可以开启一个叫 OES_element_index_uint
+        的扩展，以保证能够元素缓冲区可以使用更大的整型进行填充。使用如下：
+      </p>
+
+      <pre data-code="code1.js" data-lang="js"></pre>
+
+      <p>
+        开启扩展后，就可以使用 <code>Unit32Array</code> 类型存储元素的索引了，注意绘制的时候把类型对齐，<code
+          >Unit32Array</code
+        >
+        类型的元素缓冲区绘制时每个单元的大小是 <code>gl.UNSIGEND_INT</code>，写错屏幕就黑了。
+      </p>
+    </article>
+  </body>
+</html>

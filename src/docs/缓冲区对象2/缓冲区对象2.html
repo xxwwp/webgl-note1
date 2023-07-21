@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>缓冲区对象2</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>缓冲区对象2</h1>
+      <hr />
+
+      <p>本示例演示了如何把顶点的坐标和其他信息都放入缓冲区并读取。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>上面演示了绘制不同大小的点的效果，为此需要把每个点的大小都传给着色器，顶点着色器修改如下：</p>
+
+      <pre data-code="app.js" data-slice="2,8" data-lang="glsl"></pre>
+
+      <p>
+        在顶点着色器中新增了 attribute 变量 <code>u_PointSize</code>，它被用来获取顶点的大小，然后传递给内置变量
+        <code>gl_PointSize</code>。
+      </p>
+
+      <p>
+        每个顶点的大小都是动态的，并不是一个单一固定数据，所以不能使用 uniform 变量，uniform
+        变量总是用来描述不变的值，如果强行使用 uniform 来声明，顶点大小将无法传入到着色器程序中。
+      </p>
+
+      <p>
+        相比《缓冲区对象》，上文的实现需要在缓冲区中新增了顶点大小的数据，缓冲区改变，那么分配方式也要改变。大致如下：
+      </p>
+
+      <pre data-code="app.js" data-slice="36,77" data-lang="js"></pre>
+
+      <p>
+        缓冲区的数据中，每个顶点都新增了绘制点大小的值，并紧跟坐标一起存放，每一组数据是 3 个，每个都是 Float32 类型。
+      </p>
+
+      <p>
+        因为缓冲区改变，所以分配给 <code>a_Position</code> 的方式也需要改变，倒数第二个参数被修改成了
+        <code>FSIZE * 3</code>，表示读取该缓冲区每组数据是 3 个 Float
+        类型的数据，在读取下个组数据的时候，指针需要进行对应的偏移。
+      </p>
+
+      <p>
+        紧接着为 <code>u_PointSize</code> 分配缓冲区，与分配给
+        <code>a_Position</code> 不同的是，每组数据只读取一个，并且缓冲区的起始偏移量为
+        <code>FSIZE * 2</code>，这将忽略第一个顶点的坐标，直接从顶点大小开始读取。 这种方式最后一组数据就会只有一项即
+        <code>20.0</code>，正好对应了第二个参数 <code>1</code>，这样读取最后一组数据时指针就不会溢出。
+      </p>
+
+      <h2>gl.vertexAttribPointer 地址指针引用</h2>
+
+      <p>
+        <code>gl.vertexAttribPointer</code> 会让对应的 attribute 变量记住绑定时缓冲区的引用，一旦绑定后，肆意使用
+        <code>gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer)</code> 重新绑定缓冲区都不会之前绑定的 attribute
+        变量产生影响。
+      </p>
+
+      <p>
+        也就是说，上文中 <code>a_Position</code> 和
+        <code>u_PointSize</code>
+        可以使用两个不同的缓冲区进行分配，并不一定要使用同一个，只要在绑定完成一个后，再绑定另一个即可。但是这种方式兵不利于开发，示例中把一个顶点的相关数据存放到一起的方式在实际运用中会更高效快速。
+      </p>
+
+      <h2>gl.vertexAttribPointer 读取行为</h2>
+
+      <p>
+        当使用 <code>gl.vertexAttribPointer</code> 为某个 attribute 变量分配缓冲区并启用后，变量读取数据的方式类似
+        <code>gl.vertexAttrib[1234]f</code>，例如声明的 attribute 变量是 <code>vec4</code> 类型，而
+        <code>gl.vertexAttribPointer</code> 分配的时候每次只读取一个值，那么剩下的三个分量就会使用 0.0，0.0，1.0
+        来填充。
+      </p>
+    </article>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模型变换</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>模型变换</h1>
+      <hr />
+
+      <p>模型变换指定了我们绘制是一个模型是否进行了平移、旋转、缩放、斜切等变换。实际上就是一系列变换的集合。</p>
+
+      <p>一个比较好的方式是让模型的中心正好在原点，并摆正模型，这样我们就可以从 0 开始进行变换。</p>
+
+      <h2>平移</h2>
+
+      <p>
+        平移实际上就是使用到了平移矩阵而已，使用齐次坐标进行矩阵运算，物体沿着 X 轴移动 dx，沿着 Y 轴移动 dy，沿着 Z
+        轴移动 dz 的矩阵为：
+      </p>
+
+      <p data-code="code1.tex"></p>
+
+      <h2>旋转</h2>
+
+      <p>
+        旋转一般可以有两种方式，欧拉角旋转矩阵和四元数，本节都不介绍，欧拉角旋转矩阵推导非常简单，四元数我才学了个皮毛，才知道大致意思，就不出来误人子弟了。
+      </p>
+
+      <h3>缩放</h3>
+
+      <p>
+        缩放矩阵实际上就是放大放小对应的轴，只需要把缩放因子乘以对应的轴就行，给定 X 轴缩放 zoomX，y 轴缩放 zoomY，z
+        轴缩放 zoomZ，那么对应的缩放矩阵即为：
+      </p>
+
+      <p data-code="code2.tex"></p>
+
+      <p>如果是等比例缩放，那么显而易见 zoomX、zoomY、zoomZ 三个值相等。</p>
+
+      <h2>斜切</h2>
+
+      <p>
+        斜切英文对其 skew，即倾斜的变换，这并不等同于旋转，在 css 中有个很好的例子，可以查看
+        <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/transform">MDN</a> 中 css 的演示。
+      </p>
+
+      <p>然而斜切实际上用得非常少，主要是渲染的效果不太美观，场景比较少。</p>
+
+      <p>斜切的矩阵也很复杂，每条轴都有两个旋转角度，分别是旋转到其他轴的角度。一个斜切矩阵有 6 个角度值。</p>
+
+      <p>取最简单的 X 轴来说，设 X 轴旋转到 Y 轴的角度是 θ，旋转到 Z 轴的角度是 δ，那么针对于 X 中斜切公式为：</p>
+
+      <p data-code="code3.tex"></p>
+
+      <p>这还只是一条轴，三条轴一共 6 个角度值，费力不讨好，用处不大，就不继续推了。</p>
+
+      <p>
+        针对于斜切矩阵，它是有可能压缩整个空间的，比如 X 轴旋转到和 Y 轴相同，这个时候空间会被挤压成一个平面。可以代入 θ
+        或 δ 为 90° 到上面的例子，会发现矩阵丢失了 X 轴的空间。
+      </p>
+
+      <h2>变换顺序</h2>
+
+      <p>一般来说，模型变换的顺序都是先缩放，再旋转，最后平移。</p>
+    </article>
+  </body>
+</html>

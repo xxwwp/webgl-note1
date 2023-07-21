@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>复用数据多次绘制</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>复用数据多次绘制</h1>
+      <hr />
+
+      <p>本示例演示了复用同一个模型的数据进行多次绘制。</p>
+
+      <p>这个示例是基于《Blinn-Phong模型应用2》修改的的。</p>
+
+      <style>
+        #webgl:focus {
+          outline: 10px solid rgb(109, 87, 255);
+        }
+      </style>
+      <canvas id="webgl" width="400" height="400" tabindex="-1"></canvas>
+
+      <p>示例中绘制了 9 个正方体，然而我们并没有真的导入了 9 个正方体的顶点数据。</p>
+
+      <p>
+        webgl 可以结合多次绘制的结果渲染到一次，即<strong>同步调用多次</strong> <code>gl.drawArrays</code> 或者
+        <code>gl.drawElements</code> 就可以把绘制的结果都放到下一帧中。
+      </p>
+
+      <p>
+        观察可知，我们可以复用一个正方体的数据进行绘制，针对每个正方体的绘制，只是改变了它们的位置，也就是改变了模型矩阵，但是目前我们的绘制中所有矩阵都依赖模型矩阵，假设模型矩阵是
+        $M$，和模型矩阵相关的变换矩阵是：
+      </p>
+
+      <ul>
+        <li>顶点变换矩阵：$M_{透视投影} M_{视图变换} M$</li>
+        <li>法向量变换矩阵：$(M^{-1})^T$</li>
+        <li>模型变换矩阵本身：$M$</li>
+      </ul>
+
+      <p>
+        所以绘制每个正方体，我们只能复用数据缓冲区和光照效果，所有的矩阵都要重新设置。在此之前我们可以复用这次绘制所有其他的功能和数据：
+      </p>
+
+      <pre data-code="app.js" data-slice="125,162" data-lang="js"></pre>
+
+      <p>
+        可以看到，现在一次绘制我们先计算了透视投影和视图变换矩阵，这对于所有正方体都是相同的，所以我们可以提前计算，然后初始化各种数据缓冲区和光照，最后我们调用
+        <code>drawCube</code>
+        单独绘制每一个正方体。然后我们把准备好的除去模型矩阵以外的矩阵和每个正方体的平移偏移量给绘制正方体的函数进行绘制。
+      </p>
+
+      <p>绘制正方体的函数如下：</p>
+
+      <pre data-code="app.js" data-slice="163,187" data-lang="js"></pre>
+
+      <p>
+        绘制正方体的时候，我们需要给每个正方体准备对应的模型矩阵，然后用这个模型矩阵计算法向量变换矩阵和顶点变换矩阵，最后写入相关矩阵数据，然后进行绘制。
+      </p>
+
+      <p>
+        我们两次调用 <code>gl.drawElements</code> 的中间并没有重新初始化顶点数据和光照数据，所以下次绘制的时候，webgl
+        就会复用这些数据。而需要更新的数据实际上就是这几个矩阵。
+      </p>
+
+      <p>
+        示例中我们每一帧画面绘制了 9
+        次，每次绘制一正方体。但是这样<strong>多次绘制非常损耗性能</strong>，如果把正方体数目提升到 10 *
+        10，那么卡顿感会很明显，如果是 100 * 100 一共 10000 个正方形，我的 AMD Ryzen 5 5600X 加 GTX 1660
+        直接画面抱死，渲染不出来。
+      </p>
+
+      <p>才疏学浅，写这篇文章的时候我也是个小白，针对这种情况知道的优化方案只有：</p>
+
+      <ul>
+        <li>批量绘制：就是我们生成所有的正方体数据一次性写入缓冲区一次性绘制。</li>
+        <li>几何着色器：直接在着色器里面生成顶点并绘制，也是一次性绘制。</li>
+        <li>实例化绘制：可以用来处理层次模型和多个相同物体的绘制。</li>
+      </ul>
+
+      <p>批量绘制我们就要准备出对应数量正方体所有的顶点数据，显然这会产生很多的数据冗余。</p>
+
+      <p>几何着色器我暂时还没学，就不说多了误人子弟。</p>
+
+      <p>
+        实例化绘制可以让我们准备好数据后把多次渲染合并成一次性渲染，我们可以把多次绘制的相关数据传入每一次绘制当中，然后让着色器依次进行绘制。
+      </p>
+
+      <p>上述三种方式都比多次调用 <code>gl.drawArrays</code> 和 <code>gl.drawElements</code> 快很多。</p>
+    </article>
+  </body>
+</html>

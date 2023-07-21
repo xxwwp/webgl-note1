@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blinn-Phong模型应用2</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>Blinn-Phong模型应用2</h1>
+      <hr />
+
+      <p>
+        本示例演示了 Blinn-Phong 模型的实现。示例可交互，获取焦点后可以使用键盘鼠标交互，键位为
+        <kbd>WASDTB</kbd> 移动和鼠标改变视角。
+      </p>
+
+      <p>这个示例是基于《Blinn-Phong模型应用1》修改的的。</p>
+
+      <style>
+        #webgl:focus {
+          outline: 10px solid rgb(109, 87, 255);
+        }
+      </style>
+      <canvas id="webgl" width="400" height="400" tabindex="-1"></canvas>
+
+      <p>
+        示例中含有点光源、平行光和环境光照，但是我们依旧没有计算镜面反射的高光，在正方体这样非常规则的图形上高光很难看到。
+      </p>
+
+      <p>首先我们需要定义点光源的位置和强度：</p>
+
+      <pre data-code="app.js" data-slice="81,86" data-lang="js"></pre>
+
+      <p>
+        可以看到我们定义的光照强度是很高的，点光源的位置在左后方。不同于平行光的是，我们需要对三角形上的每个坐标点都处理点光源的照射效果，所以我们还需要对顶点进行插值，以保证在片元着色器中能够获取每个点的坐标，顶点着色器着色器如下：
+      </p>
+
+      <pre data-code="app.js" data-slice="5,24" data-lang="glsl"></pre>
+
+      <p>
+        我们格外传输了模型变换矩阵，用来计算模型变换之后的顶点坐标，从而保证正确的坐标插值。然后使用 varying 类型的变量
+        <code>v_Position</code> 把插值后的顶点坐标传输给片元着色器。
+      </p>
+
+      <p>在片元着色器中，需要计算光源对每个坐标的入射方向和入射距离，然后计算点光源的漫反射效果，如下：</p>
+
+      <pre data-code="app.js" data-slice="26,57" data-lang="glsl"></pre>
+    </article>
+  </body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>正交投影矩阵应用</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>正交投影矩阵应用</h1>
+      <hr />
+
+      <p>该示例演示了正交投影矩阵的运用。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <div>
+        <div>
+          left:
+          <input type="range" min="-2" max="2" step="0.00001" oninput="matParam(0,event)" value="-1" />
+          <span></span>
+        </div>
+        <div>
+          right:
+          <input type="range" min="-2" max="2" step="0.00001" oninput="matParam(1,event)" value="1" />
+          <span></span>
+        </div>
+        <div>
+          bottom:
+          <input type="range" min="-2" max="2" step="0.00001" oninput="matParam(2,event)" value="-1" />
+          <span></span>
+        </div>
+        <div>
+          top:
+          <input type="range" min="-2" max="2" step="0.00001" oninput="matParam(3,event)" value="1" />
+          <span></span>
+        </div>
+        <div>
+          near:
+          <input type="range" min="-2" max="2" step="0.00001" oninput="matParam(4,event)" value="1" />
+          <span></span>
+        </div>
+        <div>
+          far:
+          <input type="range" min="-2" max="2" step="0.00001" oninput="matParam(5,event)" value="-1" />
+          <span></span>
+        </div>
+      </div>
+
+      <p>
+        移动滑轮，可以查看正交投影矩阵产生的效果。因为正交投影矩阵在 Z
+        轴上不会出现近大远小的效果，所以移动远近滑轮的时候，三角形离开正交投影区域就会突然消失。
+      </p>
+
+      <p>
+        一个有趣的现象就是，left 方向的值并不一定要比 right 小，其他几个方向也是。尝试把 bottom 滑轮移动到 2，top
+        滑轮移动到 -2，会发现三角形颠倒了，这是因为正交投影矩阵在缩放的时候使用负值了。
+      </p>
+
+      <p>
+        <strong
+          >通过设置正交投影矩阵的参数，我们可以让场景中渲染更多或更少的图形。一般情况下，正交投影的 Z
+          轴数据仅做深度参考，用处不大。</strong
+        >
+      </p>
+
+      <p>至于代码实际上很简单，在顶点着色器中我们需要使用矩阵对顶点进行变换：</p>
+
+      <pre data-code="app.js" data-slice="4,13" data-lang="glsl"></pre>
+
+      <p>
+        接着准备矩阵对 <code>u_Ortho</code> 变量进行写入即可，本文使用矩阵 api 来自
+        gl-matrix。参考上一节《正交投影矩阵》。
+      </p>
+    </article>
+  </body>
+</html>

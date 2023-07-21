@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>模型变换应用</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>模型变换应用</h1>
+      <hr />
+
+      <p>
+        本示例演示了绘制一个正方体。示例可交互，获取焦点后可以使用键盘鼠标交互，键位为
+        <kbd>WASDTB</kbd> 移动和鼠标改变视角。
+      </p>
+
+      <p>这个示例是基于《绘制正方体》的。</p>
+
+      <style>
+        #webgl:focus {
+          outline: 10px solid rgb(109, 87, 255);
+        }
+      </style>
+      <canvas id="webgl" width="400" height="400" tabindex="-1"></canvas>
+
+      <p>
+        示例中绘制了每个面的颜色都不一样的，我以为有什么简便方法可以给每个面设置固定的颜色，然而并没有，webgl
+        就是单纯的设置更多的顶点来渲染同样颜色的三角形。
+      </p>
+
+      <p>
+        我也没心思一个顶点一个顶点的写，数据复制粘贴于《WebGL 编程指南》，可以在<a
+          href="https://sites.google.com/site/webglbook/home/chapter-7"
+          target="_blank"
+          >此处</a
+        >找到顶点和颜色数据，并进行绘制即可。
+      </p>
+    </article>
+  </body>
+</html>

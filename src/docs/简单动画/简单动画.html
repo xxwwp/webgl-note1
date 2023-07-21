@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>简单动画</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>简单动画</h1>
+      <hr />
+
+      <p>本示例演示了如何 webgl 在 js 中的简单动画。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>
+        从这节开始，矩阵运算使用库 <strong><a href="https://glmatrix.net/">gl-matrix</a></strong
+        >，本节的代码使用 ES6 模块化导入，在代码开头对 gl-matrix 进行了导入：
+      </p>
+
+      <pre data-code="app.js" data-slice="0,2" data-lang="js"></pre>
+
+      <p>为了简化绘制函数的逻辑，代码对矩阵的设置还有三角形的绘制进行了封装：</p>
+
+      <pre data-code="app.js" data-slice="44,56" data-lang="js"></pre>
+
+      <p>逻辑分离后把两个函数传入给绘制函数，绘制函数相关逻辑如下：</p>
+
+      <pre data-code="app.js" data-slice="58,80" data-lang="js"></pre>
+
+      <p>
+        <code>draw</code> 复杂的地方在于 gl-matrix 库的使用，gl-matrix 提供
+        <code>mat4</code> 对象来处理矩阵相关操作，代码中遇到的 api 相关语法可以参考 gl-matrix。这里解释下
+        <code>mat4.rotateZ</code> 的语法：
+      </p>
+
+      <pre><code>(static) rotateZ(out, a, rad) → {mat4}</code></pre>
+
+      <p>
+        其中 <code>out</code> 参数是输出结果的矩阵引用，<code>a</code> 是需要被旋转的矩阵，<code>rad</code>
+        是旋转的弧度值。<code>mat4.translate</code>的前两个参数也类似
+        <code>mat4.rotateZ</code>，只是最后一个参数是移动的位置向量。
+      </p>
+
+      <p>
+        <code>mat4.create</code> 是创建一个单位矩阵，即对角线为 1 其他的值都为 0。 结合前文，<code
+          >mat4.rotateZ(mat4.create(), mat4.create(), angle)</code
+        >
+        的返回值就是对默认的视图进行 Z 轴渲染的矩阵，这个值是 <code>Float32Array</code> 类型，所以可以直接作用于
+        <code>gl.uniformMatrix4fv</code> 函数。
+      </p>
+
+      <p>
+        最后是
+        <code>requestAnimationFrame</code>
+        函数，它接收一个回调，在页面绘制下一帧前进行调用。所以不同硬件的电脑，不同的负载下，它的调用频率是不同的，就算是同一台电脑，绘制没帧所需的时间也不完全相同。所以代码中结合了自定义旋转速度加时间的偏移量来计算下一帧该如何渲染。
+      </p>
+    </article>
+  </body>
+</html>

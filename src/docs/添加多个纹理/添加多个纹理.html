@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>添加多个纹理</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>添加多个纹理</h1>
+      <hr />
+
+      <p>该示例演示了如何添加多个纹理</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>上一节《添加纹理》介绍了如何为顶点映射纹理，这节主要介绍如何添加多个纹理。</p>
+
+      <p>
+        我们让多个纹理都使用同样的纹理坐标，这样纹理坐标就被复用了，但是格外的纹理数据还是要额外添加。首先在片元着色器中声明出第二个纹理：
+      </p>
+
+      <pre data-code="app.js" data-slice="14,16" data-lang="glsl"></pre>
+
+      <p>至于命名可以随意，这里序列号从 0 开始对应的是纹理单元 <code>gl.TEXTURE</code> 的索引号。</p>
+
+      <p>
+        现在的问题是，如果把纹理绘制在同一片区域上，那么后面绘制的纹理会覆盖前面绘制的纹理，为了更好的看到效果，此处使用颜色相乘，让一个像素同时作用两个纹理的采样结果。根据
+        ELSL 语言的计算方式，两个 vec 类型相乘等于对应分量相乘，再次不做详细解释。相乘的实现为：
+      </p>
+
+      <pre data-code="app.js" data-slice="19,22" data-lang="glsl"></pre>
+
+      <p>
+        接着使用 js 对两个纹理数据向 webgl 进行注入，我们需要把《添加纹理》一节中的
+        <code>initTexture</code> 进行封装，额外添加一个参数作用纹理单元的序号：
+      </p>
+
+      <pre data-code="app.js" data-slice="105,141" data-lang="js"></pre>
+
+      <p>
+        上诉代码动态的为每个纹理设置使用的纹理单元，通过
+        <code>gl[`TEXTURE${index}`]</code> 来获取对应的纹理单元的索引（或地址）并在绘制时进行激活。
+      </p>
+
+      <p>然后修改 <code>main</code> 函数中的文件加载，在加载完成所有纹理后进行绘制：</p>
+
+      <pre data-code="app.js" data-slice="43,50" data-lang="js"></pre>
+    </article>
+  </body>
+</html>

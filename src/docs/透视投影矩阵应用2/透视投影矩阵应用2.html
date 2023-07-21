@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>透视投影矩阵应用2</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>透视投影矩阵应用2</h1>
+      <hr />
+      <p>这个示例使用工程环境的库 gl-matrix ，这个库直接提供透视投影矩阵。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <div>
+        角度分数：<input type="range" id="fov" min="0.25" max="0.6667" value="0.5" step="0.0001" />
+        <span>0.5</span>，fov 等于这个值乘以 π
+        <br />
+        aspect：<input type="range" id="aspect" min="0.5" max="1.5" value="1" step="0.0001" />
+        <span>1</span>
+        <br />
+        near：<input type="range" id="near" min="1" max="11" value="1" step="0.0001" />
+        <span>1</span>
+        <br />
+        far：<input type="range" id="far" min="1" max="11" value="3" step="0.0001" />
+        <span>3</span>
+        <br />
+      </div>
+
+      <p>
+        在工程中实现的透视投影矩阵一般是我们《透视投影矩阵》一文中最后推导的结果。具有四个输入值分别是 fovy
+        俯仰角度，aspect 纵横比和 near 近平面距离 far 远平面距离。gl-matrix 中实现的声明如下：
+      </p>
+
+      <pre><code class="language-txt">(static) perspective(out, fovy, aspect, near, far) → {mat4}</code></pre>
+
+      <p>gl-matrix 中使用如下：</p>
+
+      <pre><code class="language-js">const mat4Perspective = mat4.perspective(mat4.create(), fov, aspect, near, far);</code></pre>
+
+      <p>本文不解释 js 部分代码，有兴趣可以翻看源码。</p>
+    </article>
+  </body>
+</html>

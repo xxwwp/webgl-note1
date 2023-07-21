@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>绘制正方体3</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" type="module" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>绘制正方体3</h1>
+      <hr />
+
+      <p>
+        本示例演示了绘制一个正方体。示例可交互，获取焦点后可以使用键盘鼠标交互，键位为
+        <kbd>WASDTB</kbd> 移动和鼠标改变视角。
+      </p>
+
+      <p>这个示例是基于《绘制正方体2》的。</p>
+
+      <style>
+        #webgl:focus {
+          outline: 10px solid rgb(109, 87, 255);
+        }
+      </style>
+      <canvas id="webgl" width="400" height="400" tabindex="-1"></canvas>
+
+      <p>示例中代码沿用《绘制正方体2》，只是修改了颜色。</p>
+    </article>
+  </body>
+</html>

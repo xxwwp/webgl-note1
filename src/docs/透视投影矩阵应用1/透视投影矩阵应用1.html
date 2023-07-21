@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>透视投影矩阵应用1</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>透视投影矩阵应用1</h1>
+      <hr />
+      <p>该示例演示了如何运用《透视投影矩阵》一文中【推导】一节得出的透视投影矩阵。</p>
+
+      <h2>适用于 webgl</h2>
+
+      <p>在《透视投影矩阵》【推导】中我们推导出透视投影矩阵为：</p>
+
+      <p data-code="./code1.tex"></p>
+
+      <p>
+        在《透视投影矩阵》【webgl 中齐次坐标分量不能为负值】中又提到，上述公式在 webgl
+        中使用时，还有一个限制和一个修改：
+      </p>
+
+      <ul>
+        <li>一个限制：这个矩阵不能作用 Z 值小于 0 的点，所以只能透视顶点 Z 值大于 0 的情况。</li>
+        <li>
+          一个修改，这个推导 n 和 f 使用的是坐标值基于右手坐标系，最后近平面 Z 轴映射到了 1，远平面 Z 轴映射
+          -1，是右手坐标系，所以我们还需要把 webgl 坐标系切换成右手坐标系。
+        </li>
+      </ul>
+
+      <p>
+        根据这个限制，我们绘制的三角形顶点 Z 值都要大于 0，那么想要看到大于 Z 值大于 0 的点，就有 $0 &lt; n &lt;
+        f$，所以说这个推导在 webgl 中很反人类。
+      </p>
+
+      <p>又前面这个修改，最后能在 webgl 中使用的矩阵应该是：</p>
+
+      <p data-code="code2.tex"></p>
+
+      <h2>实践</h2>
+
+      <p>我们给定矩阵的因子的值，然后计算透视投影矩阵：</p>
+
+      <pre data-code="app.js" data-lang="js" data-slice="91,112"></pre>
+
+      <p>可以看到为了看到 Z 值大于 0 的点，n 和 f 设置成了 1 和 3。</p>
+
+      <p>
+        然后用来渲染的三角形顶点也要满足大于 0，这里使用了动态生成三角形，每个三角形的 Z 值根据句号依次填充到 n 和 f
+        之间：
+      </p>
+
+      <pre data-code="app.js" data-lang="js" data-slice="66,79"></pre>
+
+      <p>为了看的更清楚，我们让第一个三角形偏红，即近平面的三角形。还有别忘了在着色器中写入矩阵并变换所有的顶点：</p>
+
+      <pre data-code="app.js" data-lang="glsl" data-slice="8,9"></pre>
+
+      <p>最后的效果如下：</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <h2>小结</h2>
+
+      <p>所以这个矩阵我们并没有推错，只是在 webgl 中使用起来非常别扭。主要原因还是前文提到的限制和修改。</p>
+
+      <ul>
+        <li>因为限制，导致我们要使用 Z 值大于 0 的顶点，导致 n 和 f 的大小关系变换。</li>
+        <li>因为推导用的左手坐标系，我们还需要再乘以一个翻转 Z 轴的</li>
+      </ul>
+    </article>
+  </body>
+</html>

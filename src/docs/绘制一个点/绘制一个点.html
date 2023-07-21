@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>绘制一个点</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>绘制一个点</h1>
+      <hr />
+
+      <p>从本节开始，使用《WebGL 编程指南》提供的部分代码对代码进行简化。</p>
+      <p>页面中将预先使用以下文件：</p>
+      <pre data-code="code1.txt" data-lang="html"></pre>
+      <blockquote>
+        需要注意的是，这些文件使用的 webgl 是 1 版本，我没有进行改动，以免出现预料之外的错误。不过 webgl2 是完全兼容
+        webgl1 的。
+      </blockquote>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>该示例在屏幕中绘制了一个点。</p>
+
+      <p>
+        在 webgl 中，如何绘制图像都由一种 GLSL 的语言来描述。GLSL
+        由两部分组成，一部分用来描述需要绘制的点的位置大小等信息，一部分用来描述如何给每个像素上色。
+      </p>
+
+      <p>绘制点的 GLSL 程序要做顶点着色器，这些点都叫做顶点。比如普通的一个点，线段的端点，三角形的三个顶点。</p>
+
+      <p>上色的 GLSL 程序要做片元着色器，它根据顶点着色器提供的顶点信息，来绘制点线面并上色。</p>
+
+      <p>GLSL 语言类似 C 语言，是强类型语言。</p>
+
+      <pre data-code="app.js" data-lang="js"></pre>
+
+      <p>
+        在代码中顶点着色器程序中，使用两个内置变量
+        <code>gl_Position,gl_PointSize</code>，这两个变量描述需要绘制的点的位置和大小，其中位置使用
+        <code>vec4</code> 类型，这是一个齐次坐标，所以最后一项是 1。
+      </p>
+
+      <p>示例中的偏远着色器更简单，只是设置了内置的片元颜色为红色。<code>gl_FraColor</code> 同样是一个内置变量。</p>
+
+      <p>
+        <code>main</code> 函数最后使用
+        <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/WebGLRenderingContext/drawArrays"
+          ><code>gl.drawArrays</code></a
+        >
+        来绘制一个点。
+      </p>
+
+      <p>
+        可以尝试修改着色器中点的位置，大小和颜色，可以看到点发送的变化。需要注意的是，GLSL 中点的位置范围是 -1 到 1，X
+        和 Y 轴上的 -1 和 1 表示这个 canvas 的边界，无论这个 canvas 是长方形还是正方形，Y
+        轴上默认就是正交投影，所以改变值并不会有远小近大的效果。
+      </p>
+
+      <p>另外，webgl 使用的是左手坐标系，X 水平从左到右。</p>
+    </article>
+  </body>
+</html>

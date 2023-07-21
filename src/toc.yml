@@ -1,0 +1,96 @@
+toc:
+  - name: 准备
+    children:
+      - rePath: 初始化webgl
+        desc:
+      - rePath: 绘制一个点
+        desc:
+      - rePath: 绘制一个点2
+        desc:
+      - rePath: 绘制一个点3
+        desc:
+      - rePath: 绘制多个有色点
+        desc:
+
+  - name: 绘制三角形和变换
+    children:
+      - rePath: 缓冲区对象
+        desc: 同时绘制多个点，绘制一个三角形
+      - rePath: 缓冲区对象2
+        desc: 把顶点的坐标和其他信息都放入缓冲区并读取
+      - rePath: 点线面绘制
+        desc: 介绍 webgl 中绘制点线面的所有方式
+      - rePath: 矩阵变换1
+        desc: 简单的绕 Z 轴渲染加平移矩阵应用
+      - rePath: 简单动画
+        desc:
+      - rePath: 为顶点传递颜色
+        desc: 演示如何从顶点着色器把颜色传递到片元着色器
+      - rePath: webgl坐标系
+        desc: 介绍 webgl 坐标系、ZBuffer 深度缓冲区、多边形偏移
+  - name: 纹理
+    children:
+      - rePath: 添加纹理
+        desc: 绘制一个正方形，为正方形添加纹理
+      - rePath: 添加多个纹理
+        desc: 为一次渲染添加多个纹理
+  - name: GLSL ES
+    children:
+      - rePath: 加载着色器语言
+        desc:
+  - name: 3D 变换
+    children:
+      - rePath: 3D变换序
+        desc:
+      - rePath: 模型变换
+        desc:
+      - rePath: 视图变换
+        desc:
+      - rePath: 正交投影矩阵
+        desc:
+      - rePath: 正交投影矩阵应用
+        desc:
+      - rePath: 透视投影矩阵
+        desc:
+      - rePath: 透视投影矩阵应用1
+        desc: 使用自己推导透视投影矩阵
+      - rePath: 透视投影矩阵应用2
+        desc: 使用 gl-matrix 的示例，内含滚轮修改相关参数
+      - rePath: 透视投影矩阵应用3
+        desc: 使用键盘鼠标在场景中移动，让用户交互连接视图变换
+  - name: 元素绘制
+    children:
+      - rePath: 绘制正方体
+        desc: 介绍了如何根据元素来绘制一个正方体
+      - rePath: 绘制正方体2
+        desc: 介绍了绘制一个面为一个颜色的正方体
+      - rePath: 绘制正方体3
+        desc: 介绍了一个白色正方体
+  - name: 光照
+    children:
+      - rePath: 颜色、光源和漫反射
+        desc: 介绍了颜色相乘相加，点光源，平行光，Blinn-Phong 模型中的环境光照、漫反射和镜面反射
+      - rePath: 着色频率
+        desc: 介绍着色频率和顶点法向量
+      - rePath: 法向量变换矩阵
+        desc: 介绍顶点法向量，和法向量变换矩阵
+      - rePath: Blinn-Phong模型应用1
+        desc: 介绍环境光下的渲染
+      - rePath: Blinn-Phong模型应用2
+        desc: 基于《Blinn-Phong模型应用1》添加点光源
+  - name: 数据复用
+    children:
+      - rePath: 复用数据多次绘制
+        desc:
+      - rePath: 实例化绘制
+        desc:
+  - name: 骨骼和皮肤
+    children:
+      - rePath: 层次模型
+        desc:
+      - rePath: 蒙皮
+        desc:
+  - name: 阴影
+    children:
+      - rePath: 帧缓冲区对象
+        desc:

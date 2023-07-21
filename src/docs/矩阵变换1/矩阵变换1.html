@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>矩阵变换1</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>矩阵变换1</h1>
+      <hr />
+
+      <p>本示例介绍了如何使用绕 Z 轴旋转的矩阵变换和平移变换。</p>
+
+      <p>本文使用 4 * 4 的齐次坐标进行变换，不介绍平移和旋转矩阵的变换计算方式。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>
+        GLSL 也可以处理矩阵和向量的乘法，这就为了顶点的矩阵变换而实现的。在着色器中声明一个矩阵可以使用以下语法：
+        <code></code>
+      </p>
+
+      <pre><code class="language-glsl">uniform mat4 变量名;</code></pre>
+
+      <p>这个示例的顶点着色器如下：</p>
+
+      <pre data-code="app.js" data-slice="2,8" data-lang="glsl"></pre>
+
+      <p>GLSL 简化了计算过程，让着色器代码更专注于逻辑，所以一个 4 * 4 类型的矩阵才可以直接用 * 号与顶点相乘。</p>
+
+      <p>这个矩阵的准备就像之前设置 uniform 变量一样处理即可：</p>
+
+      <pre data-code="app.js" data-slice="36,62" data-lang="js"></pre>
+
+      <blockquote>
+        我这里因为 Prettier 自动换行的原因，矩阵的数据只能使用展开符和注释符来限制格式。实际上就是一个 16 项的数组。
+      </blockquote>
+
+      <p>
+        如果熟悉矩阵变换的人肯定会发觉一个事情，我给出的矩阵是转置的。这是因为 webgl 源于 OpenGL，而 OpenGL
+        使用的是按列主序，所以矩阵需要转置。
+      </p>
+
+      <h2>参考</h2>
+
+      <p>绕 Z 轴旋转矩阵，按行主序：</p>
+
+      <p data-code="code.tex"></p>
+
+      <p>平移矩阵，按行主序：</p>
+
+      <p data-code="code1.tex"></p>
+    </article>
+  </body>
+</html>

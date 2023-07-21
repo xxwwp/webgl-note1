@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>缓冲区对象</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>缓冲区对象</h1>
+      <hr />
+
+      <p>本节示例演示如何使用缓冲区对象同时绘制多个点。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>核心实现如下 5 步：</p>
+
+      <pre data-code="app.js" data-slice="39,58" data-lang="js"></pre>
+
+      <p>webgl 的存储操作非常低级，连存储坐标的空间都要自己申请和绑定。</p>
+
+      <h2>创建缓冲区</h2>
+
+      <p>
+        使用 <code>gl.createBuffer</code> 创建一个 WebGLBuffer
+        类型的缓冲区（即存储区）对象，相当于在计算机中申请了一段内存。
+      </p>
+
+      <p>WebGLBuffer 类型没有任何属性和方法，所以不能直接对它写入或读取数据。</p>
+
+      <p>
+        webgl 不只是处理坐标，其他类型的数据也可能需要缓冲区存储数据，所以
+        <code>gl.createBuffer</code> 只是创建，并没有指定这段缓冲区和 webgl 的关系。
+      </p>
+
+      <h2>绑定到当前缓冲区</h2>
+
+      <p>
+        通过 <code>gl.bindBuffer</code> 可以绑定一个缓冲区到 webgl 中使用。参数
+        <code>gl.ARRAY_BUFFER</code> 指定绑定的目标是顶点属性的缓冲区。
+      </p>
+
+      <h2>设置缓冲区数据</h2>
+
+      <p>
+        使用 <code>gl.bufferData</code> 可以对相应的缓冲区写入数据，示例中就对
+        <code>gl.ARRAY_BUFFER</code> 缓冲区进行数据写入，就是上文创建并绑定的缓冲区。
+      </p>
+
+      <p>可以看到写入了一组 <code>Float32Array</code> 类型的数据。</p>
+
+      <p>最后的 <code>gl.STATIC_DRAW</code> 是一个优化参数，告诉这段数据仅写入一次，后续只会一次或多次读取。</p>
+
+      <h2>分配缓冲区到 attribute 变量并定义格式</h2>
+
+      <p>
+        <code>gl.vertexAttribPointer</code> 用来指定顶点坐标缓冲区被分配给那个 GLSL
+        中的变量，并设置读取这段缓冲区的方式。声明如下：
+      </p>
+
+      <pre><code class="language-js">void gl.vertexAttribPointer(index, size, type, normalized, stride, offset);</code></pre>
+
+      <p>
+        <em>index</em>：指一个 attribute 变量的索引，这个参数指定了缓冲区的引用、指针或地址分配给哪个 attribute
+        变量，但是这并没有改变该 attribute 变量的读取方式，此时该变量还是从
+        <code>gl.vertexAttrib[1234]f</code> 函数分配的值中读取数据。
+      </p>
+
+      <p>
+        <em>size，type</em>：指定了每组数据读取多少个，每个都是什么类型。2 和 <code>gl.FLOAT</code> 告诉 webgl
+        这段缓冲区每次读 2 个，每个都是 float 类型。
+      </p>
+
+      <p>
+        <em>normalized</em>：用于设置是否对数据进行归一化处理，对于 float 类型无效，所以此处设置为
+        <code>true/false</code> 都不影响。
+      </p>
+
+      <p>
+        <em>stride</em>：表示两组数据起始行的 <strong>偏移量字节数</strong>，指定为 0
+        时表示数据之间紧密相连。因为一个顶点的有可能还携带一些其他的数据，比如纹理，贴图，这些数据也会紧跟坐标存储在缓冲区中，所以需要这个参数告诉
+        webgl 顶点数据之间的偏移量。在本例中，因为使用的是 <code>Float32Array</code> 类型，也可以使用
+        <code>Float32Array.BYTES_PER_ELEMENT * 2</code> 替换 0，其中
+        <code>.BYTES_PER_ELEMENT</code> 表示对应缓冲区类型每个元素的字节数。
+      </p>
+
+      <p>
+        <em>offset</em>：表示读取顶点时的起始
+        <strong>偏移量字节数</strong>。同上，如果需要主动设置时，也需要取对应类型的
+        <code>.BYTES_PER_ELEMENT</code> 乘上对应偏移基数。
+      </p>
+
+      <p>
+        综上，这个 api 最为复杂，它确定了当前缓冲区和哪个 GLSL attribute 变量进行绑定，还确定了缓冲区内部的数据布局。
+      </p>
+
+      <h2>启动 attribute 变量对缓冲区进行读取</h2>
+
+      <p>
+        使用 <code>gl.enableVertexAttribArray</code> 来主动启用一个 attribute
+        变量对其对应的缓冲区进行读取，默认情况下缓冲区读取是禁用状态，attribute 变量是从
+        <code>gl.vertexAttrib[1234]f</code> 获取数据，该函数相当于切换获取途径为缓冲区。
+      </p>
+
+      <p>
+        也可以使用 <strong><code>gl.disableVertexAttribArray</code></strong> 来禁用此行为。
+      </p>
+
+      <p><code>gl.enableVertexAttribArray</code> 并不一定要最后执行，只要传递的 attribute 变量位置正确即可。</p>
+
+      <blockquote>该 api 使用顶点属性数组作为名称源于 OpenGL，这是历史原因已经不便修改。</blockquote>
+
+      <h2>绘制</h2>
+
+      <p>
+        最后一行 <code>gl.drawArrays(gl.POINTS, 0, 3);</code> 绘制中，第三个参数变为了 3，表示绘制 3 次，按照
+        <code> gl.vertexAttribPointer</code> 给定的读取数据的方式进行绘制，不满足 4 个坐标分量的情况下就用
+        <code>gl.vertexAttrib[1234]f</code> 一样的方式进行默认填充。
+      </p>
+
+      <h2>绘制三角形</h2>
+
+      <p>可以通过修改 <code>gl.drawArrays</code> 的第一个参数为 <code>gl.TRIANGLES</code> 把这个示例绘制成三角形。</p>
+
+      <pre><code class="language-js">gl.drawArrays(gl.TRIANGLES, 0, 3);</code></pre>
+
+      <p>
+        <code>gl.drawArrays</code>
+        还可以绘制线条，取决于第一个参数和读取数据的方式，比如上面代码的意义就是使用顶点绘制三角形，读取三个坐标，绘制成一个三角形。
+      </p>
+    </article>
+  </body>
+</html>

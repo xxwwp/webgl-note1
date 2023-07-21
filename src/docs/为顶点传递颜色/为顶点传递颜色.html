@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>为顶点传递颜色</title>
+    <link rel="stylesheet" href="../../assets/global.css" />
+    <script src="../../assets/global.js" defer></script>
+
+    <script src="../../lib/webgl-utils.js"></script>
+    <script src="../../lib/webgl-debug.js"></script>
+    <script src="../../lib/cuon-utils.js"></script>
+
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <article class="article">
+      <h1>为顶点传递颜色</h1>
+      <hr />
+
+      <p>本节示例演示如何从顶点着色器把颜色传递到片元着色器。</p>
+
+      <canvas id="webgl" width="400" height="400"></canvas>
+
+      <p>
+        实际上，在《缓冲区对象2》一节已经介绍了如何为顶点添加额外的数据到缓冲区，所以此处不再介绍如何从 js
+        传递颜色给着色器。
+      </p>
+
+      <p>
+        本示例的 JS 部分，缓冲区的每组数据变成了 5 个，前两个是 X、Y 坐标，后三个是 RGB
+        三原色的分量，这些数据都被传入了着色器。
+      </p>
+
+      <pre data-code="app.js" data-slice="58,75" data-lang="js"></pre>
+
+      <p>接下来需要在顶点着色器中接收相关的数据：</p>
+
+      <pre data-code="app.js" data-slice="2,10" data-lang="glsl"></pre>
+
+      <p>
+        示例中使用 attribute 变量 a_Color 数据进行接收，因为 uniform 变量是不变的，所以不能用 uniform
+        变量来接收多个不同的顶点数据。
+      </p>
+
+      <p>
+        在这个顶点着色器中，使用 <strong>varying</strong> 关键字声明了一个名为 <code>v_Color</code> 的变量，并且在
+        <code>main</code> 函数中使用 <code>a_Color</code> 对其进行了赋值。<strong
+          >顶点着色器中 varying 声明的变量可以共享到片元着色器中</strong
+        >，这就是代码中使用到它的原因。但让顶点着色器向片元着色器传值，仅仅在顶点着色器中使用 varying
+        声明共享变量还不够，<strong
+          >必须要在顶点着色器和片元着色器中使用 varying
+          声明同一个变量名，该变量才会在顶点着色器和片元着色器中共享，即等同于顶点着色器向片元着色器传值。</strong
+        >所以还需要修改片元着色器代码如下：
+      </p>
+
+      <pre data-code="app.js" data-slice="13,18" data-lang="glsl"></pre>
+
+      <p>
+        此处片元着色器也使用 varying 关键字声明了变量
+        <code>v_Color</code>，和顶点着色器中同名，该变量的值就是顶点着色器中设置的值。把这个值赋给
+        <code>gl_FragColor</code>，就为相关的顶点进行上色了。
+      </p>
+
+      <p>
+        回到开始的示例，可以看到绘制出了一个渐变色的三角形。<strong
+          >当对顶点进行上色时，webgl 会使用插值的方式为相关绘制区域进行了上色。</strong
+        >也可以尝试使用其他绘制，比如
+        <code> gl.drawArrays(gl.LINE_LOOP, 0, 3)</code>，顶点之间的线条也会使用插值进行上色。
+      </p>
+
+      <p>
+        片元着色器和和顶点着色器之间其实还存在 <strong>图元装配</strong> 和
+        <strong>光栅化</strong> 过程，片元着色器最后是逐像素进行绘制。也就是说两个着色器中的
+        <code>v_Color</code> 其实并不相同，片元着色器中的
+        <code>v_Color</code> 是已经插值后得到的颜色，插值的过程发生在两个着色器之间，片元着色器只是进行上色而已。
+      </p>
+    </article>
+  </body>
+</html>
